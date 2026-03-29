@@ -1,0 +1,3 @@
+0 0 27017 ac-9j6ox9y-shard-00-00.bcqitxb.mongodb.net.
+0 0 27017 ac-9j6ox9y-shard-00-01.bcqitxb.mongodb.net.
+0 0 27017 ac-9j6ox9y-shard-00-02.bcqitxb.mongodb.net.
