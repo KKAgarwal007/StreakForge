@@ -98,6 +98,14 @@ export default function Dashboard({ setAuth }) {
         </div>
       </div>
 
+      {data.streak >= 180 && data.streak < 240 && (
+        <div className="mb-8 p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center animate-pulse">
+          <p className="text-xl font-medium text-white text-center">
+            You are <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{240 - data.streak} days</span> away from becoming Legendary 👑
+          </p>
+        </div>
+      )}
+
       <div className="glass-panel rounded-2xl p-6 md:p-8">
         <h2 className="text-xl font-semibold mb-6">Consistency Grid</h2>
         <MonthlyGrid 

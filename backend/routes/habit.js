@@ -14,10 +14,16 @@ const getLocalDateString = () => {
 
 const assignBadges = (streak, currentBadges) => {
   const newBadges = [...currentBadges];
-  if (streak >= 3 && !newBadges.includes('Bronze')) newBadges.push('Bronze');
-  if (streak >= 7 && !newBadges.includes('Silver')) newBadges.push('Silver');
-  if (streak >= 14 && !newBadges.includes('Gold')) newBadges.push('Gold');
-  if (streak >= 30 && !newBadges.includes('Diamond')) newBadges.push('Diamond');
+  if (streak >= 1 && !newBadges.includes('Bronze I')) newBadges.push('Bronze I');
+  if (streak >= 7 && !newBadges.includes('Bronze II')) newBadges.push('Bronze II');
+  if (streak >= 21 && !newBadges.includes('Bronze III')) newBadges.push('Bronze III');
+  if (streak >= 30 && !newBadges.includes('Silver I')) newBadges.push('Silver I');
+  if (streak >= 60 && !newBadges.includes('Silver II')) newBadges.push('Silver II');
+  if (streak >= 90 && !newBadges.includes('Gold I')) newBadges.push('Gold I');
+  if (streak >= 120 && !newBadges.includes('Gold II')) newBadges.push('Gold II');
+  if (streak >= 150 && !newBadges.includes('Diamond I')) newBadges.push('Diamond I');
+  if (streak >= 180 && !newBadges.includes('Diamond II')) newBadges.push('Diamond II');
+  if (streak >= 240 && !newBadges.includes('Legendary')) newBadges.push('Legendary');
   return newBadges;
 };
 
