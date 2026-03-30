@@ -1,4 +1,4 @@
-import { Check, X, Lock } from 'lucide-react';
+import { Check, X, Lock, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function MonthlyGrid({ dailyStatus, onMarkToday }) {
@@ -46,9 +46,13 @@ export default function MonthlyGrid({ dailyStatus, onMarkToday }) {
         const isPast = cellDate.getTime() < today.getTime();
         
         let state = 'future';
-        if (isToday) state = status === 'done' ? 'completed' : 'today';
-        else if (isPast) {
+        if (isToday) {
           if (status === 'done') state = 'completed';
+          else if (status === 'leave') state = 'leave';
+          else state = 'today';
+        } else if (isPast) {
+          if (status === 'done') state = 'completed';
+          else if (status === 'leave') state = 'leave';
           else if (status === 'missed') state = 'missed';
           else state = 'locked'; // past and not marked
         }
@@ -86,11 +90,13 @@ export default function MonthlyGrid({ dailyStatus, onMarkToday }) {
           let interactable = false;
           
           if (cell.state === 'today') {
-            bgColor = "bg-blue-500/20 border-blue-500 text-blue-400 cursor-pointer hover:bg-blue-500/30 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] ring-2 ring-blue-500";
-            interactable = true;
+            bgColor = "bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)] ring-1 ring-blue-500/30";
           } else if (cell.state === 'completed') {
             bgColor = "bg-emerald-500/20 border-emerald-500 text-emerald-400 ring-1 ring-emerald-500/50";
             icon = <Check size={20} />;
+          } else if (cell.state === 'leave') {
+            bgColor = "bg-orange-500/20 border-orange-500/50 text-orange-400 ring-1 ring-orange-500/50";
+            icon = <Moon size={18} />;
           } else if (cell.state === 'missed') {
             bgColor = "bg-red-500/10 border-red-500/30 text-red-400/70";
             icon = <X size={20} />;
@@ -102,7 +108,6 @@ export default function MonthlyGrid({ dailyStatus, onMarkToday }) {
           return (
             <div 
               key={cell.dateStr}
-              onClick={() => interactable && onMarkToday()}
               className={`aspect-square rounded-xl md:rounded-2xl border flex flex-col items-center justify-center relative overflow-hidden group ${bgColor}`}
             >
               <span className={`text-sm md:text-lg font-bold z-10 ${icon ? 'opacity-30' : ''}`}>

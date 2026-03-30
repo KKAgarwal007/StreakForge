@@ -12,7 +12,24 @@ const getLocalDateString = () => {
   return `${year}-${month}-${day}`;
 };
 
-const assignBadges = (streak, currentBadges) => {
+const calculateConsistency = (dailyStatusMap) => {
+  let done = 0;
+  let leave = 0;
+  let missed = 0;
+  
+  for (const status of dailyStatusMap.values()) {
+    if (status === 'done') done++;
+    else if (status === 'leave') leave++;
+    else if (status === 'missed') missed++;
+  }
+  
+  const totalDays = done + leave + missed;
+  if (totalDays === 0) return 0;
+  return done / totalDays;
+};
+
+const assignBadges = (streak, currentBadges, consistency) => {
+  if (consistency < 0.8) return currentBadges;
   const newBadges = [...currentBadges];
   if (streak >= 1 && !newBadges.includes('Bronze I')) newBadges.push('Bronze I');
   if (streak >= 7 && !newBadges.includes('Bronze II')) newBadges.push('Bronze II');
@@ -33,11 +50,13 @@ router.get('/dashboard', auth, async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     
     const dailyStatus = user.dailyStatus ? Object.fromEntries(user.dailyStatus) : {};
+    const consistency = user.dailyStatus ? calculateConsistency(user.dailyStatus) : 0;
     
     res.json({
       streak: user.streak,
       badges: user.badges,
-      dailyStatus
+      dailyStatus,
+      consistency
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -46,19 +65,46 @@ router.get('/dashboard', auth, async (req, res) => {
 
 router.post('/mark', auth, async (req, res) => {
   try {
+    const { action = 'done' } = req.body;
+    if (!['done', 'leave'].includes(action)) {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const todayStr = getLocalDateString();
     
     const currentStatus = user.dailyStatus.get(todayStr);
-    if (currentStatus === 'done') {
-      return res.status(400).json({ message: 'Already marked for today' });
+    if (currentStatus) {
+      return res.status(400).json({ message: 'Action already taken for today' });
+    }
+
+    if (action === 'leave') {
+      // Check for max 2 leaves in past 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      let leaveCount = 0;
+      for (const [dateStr, status] of user.dailyStatus.entries()) {
+        if (status === 'leave' && new Date(dateStr) >= thirtyDaysAgo) {
+          leaveCount++;
+        }
+      }
+      
+      if (leaveCount >= 2) {
+        return res.status(400).json({ message: 'Maximum 2 leaves per 30 days reached' });
+      }
     }
     
-    user.dailyStatus.set(todayStr, 'done');
-    user.streak += 1;
-    user.badges = assignBadges(user.streak, user.badges);
+    user.dailyStatus.set(todayStr, action);
+    
+    if (action === 'done') {
+      user.streak += 1;
+    }
+    
+    const consistency = calculateConsistency(user.dailyStatus);
+    user.badges = assignBadges(user.streak, user.badges, consistency);
     user.lastUpdated = new Date();
 
     await user.save();
@@ -67,7 +113,8 @@ router.post('/mark', auth, async (req, res) => {
       message: 'Marked successfully',
       streak: user.streak,
       badges: user.badges,
-      dailyStatus: Object.fromEntries(user.dailyStatus)
+      dailyStatus: Object.fromEntries(user.dailyStatus),
+      consistency
     });
     
   } catch (error) {

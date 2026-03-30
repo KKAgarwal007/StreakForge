@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   lastUpdated: { type: Date, default: Date.now },
   dailyStatus: {
     type: Map,
-    of: String, // 'done' | 'missed'
+    of: String, // 'done' | 'missed' | 'leave'
     default: {}
   }
 });
