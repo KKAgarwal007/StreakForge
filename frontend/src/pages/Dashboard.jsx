@@ -20,7 +20,7 @@ export default function Dashboard({ setAuth }) {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/habit/dashboard', {
+      const res = await axios.get('https://streakforge-1.onrender.com/api/habit/dashboard', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setData(res.data);
@@ -42,7 +42,7 @@ export default function Dashboard({ setAuth }) {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/habit/mark', { action }, {
+      const res = await axios.post('https://streakforge-1.onrender.com/api/habit/mark', { action }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       

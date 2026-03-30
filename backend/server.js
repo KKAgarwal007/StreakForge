@@ -11,7 +11,10 @@ dotenv.config({ override: true });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://streak-forge-zeta.vercel.app'], 
+  credentials: true
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

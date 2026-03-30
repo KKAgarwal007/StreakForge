@@ -12,7 +12,7 @@ export default function Auth({ setAuth }) {
     setError('');
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
     try {
-      const res = await axios.post(`http://localhost:5000${endpoint}`, { email, password });
+      const res = await axios.post(`https://streakforge-1.onrender.com${endpoint}`, { email, password });
       localStorage.setItem('token', res.data.token);
       setAuth(true);
     } catch (err) {
